@@ -1,2 +1,0 @@
-# SlateNestingBlocksExample
-Created with CodeSandbox

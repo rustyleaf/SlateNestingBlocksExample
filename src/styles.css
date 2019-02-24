@@ -1,0 +1,13 @@
+.App {
+  font-family: sans-serif;
+  text-align: center;
+}
+.div {
+  margin: 10px;
+  padding: 10px;
+  box-shadow: 0 0 0 2px blue;
+}
+p {
+  padding: 10px;
+  box-shadow: 0 0 0 2px red;
+}
