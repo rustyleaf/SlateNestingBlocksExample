@@ -1,5 +1,5 @@
 import { Editor } from "slate-react";
-import { Value } from "slate";
+import { Block, Value } from 'slate'
 
 import React from "react";
 import initialValueAsJson from "./value.json";
@@ -11,28 +11,47 @@ const schema = {
     nodes: [
       {
         match: [{ type: 'div' }],
-      },
-    ],
-  },
-  normalize: (editor, error) => {
-    if (error.code === 'child_type_invalid') {
-      //editor.wrapNodeByKey(error.child.key, { type: 'div' })
-    }
+      }
+    ]
   },
   blocks: {
-    paragraph: {
+    div: {
       nodes: [
         {
-          match: { object: 'text' },
-        },
+          match: { type: 'p' }, 
+          min: 1, 
+          max: 2,
+          parent: 'div',
+          first: 'p', 
+          last: 'p'
+        }
       ],
+      normalize: (editor, { code, node, child, index }) => {
+        const { endBlock, endInline, selection } = editor.value
+        console.log(code);      
+        switch (code) {
+          case 'child_type_invalid': {
+            const type = index === 0 ? 'div' : 'p'
+            return editor.setNodeByKey(child.key, type)
+          }
+          case 'child_max_invalid': {
+            editor
+            .removeNodeByKey(endBlock.key)
+            .addNewSubtitle(editor)
+            .moveForwardXSubtitles()
+          }
+          default:
+          console.log(code);
+        }
+      }
     }
-  },
+  }
 }
 
 const helpers = {
   commands: {
-    addNewSubtitle(editor) {
+    addNewSubtitle(editor, opts) {
+      console.log(opts)
       const { value } = editor;
       const { document } = value;
       let { subtitle } = editor
@@ -90,12 +109,14 @@ class DivExample extends React.Component {
   render() {
     return (
       <Editor
+        schema={schema}
+        plugins={plugins}
         placeholder="Enter a title..."
         defaultValue={initialValue}
         renderNode={this.renderNode}
         onKeyDown={this.onKeyDown}
-        schema={schema}
-        plugins={plugins}
+        
+        
       />
     );
   }
@@ -106,7 +127,7 @@ class DivExample extends React.Component {
       case "F2":
         
         editor
-        .addNewSubtitle()
+        .addNewSubtitle(editor, 'crazy')
         .moveForwardXSubtitles()
 
         break;
